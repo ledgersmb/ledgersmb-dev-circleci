@@ -12,5 +12,6 @@ if [[ ! -f ledgersmb.conf ]]; then
     -e "s%\(sendmail   = \).*%#\1/usr/sbin/ssmtp%g" \
     -e "s/# \(smtphost = \).*\$/\1mailhog:1025/g" \
     -e "s/# \(backup_email_from = \).*\$/\1lsmb-backups@example.com/g" \
+    -e "s/#dojo_built = 1/dojo_built = 0/" \
     ledgersmb.conf
 fi
