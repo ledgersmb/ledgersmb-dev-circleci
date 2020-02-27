@@ -57,14 +57,6 @@ RUN cd ~/project && \
                          Dist::Zilla \
                          Locale::Country
 
-RUN   eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib) && \
-  source ~/perl5/perlbrew/etc/bashrc && \
-  perlbrew use perl-$perl && \
-  cd /tmp && git clone git://github.com/pjlsergeant/test-bdd-cucumber-perl.git -b match-mode && \
-  cd test-bdd-cucumber-perl && ( dzil authordeps --missing | cpanm --notest ) && ( dzil listdeps --missing --author | cpanm --notest ) && \
-  dzil install && rm -rf ~/.cpanm && \
-  cd ~/ && rm -rf /tmp/test-bdd-cucumber-perl && rm -rf project && mkdir project
-
 USER root
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
   (wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -) && \
