@@ -32,7 +32,7 @@ RUN perlbrew init --shell=/bin/bash && \
     perlbrew use perl-$perl && \
     perlbrew install-cpanm && \
     echo "source ~/perl5/perlbrew/etc/bashrc" >> ~/.profile && \
-    cpanm inc::Module::Install Starman
+    cpanm --notest inc::Module::Install Starman
 
 RUN cd ~/project && \
   source ~/perl5/perlbrew/etc/bashrc && \
