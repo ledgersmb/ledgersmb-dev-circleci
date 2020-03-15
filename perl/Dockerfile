@@ -32,7 +32,9 @@ RUN perlbrew init --shell=/bin/bash && \
     perlbrew use perl-$perl && \
     perlbrew install-cpanm && \
     echo "source ~/perl5/perlbrew/etc/bashrc" >> ~/.profile && \
-    cpanm --notest inc::Module::Install Starman
+    cpanm --notest inc::Module::Install Starman && \
+    rm -rf ~/.cpanm && \
+    rm -rf ~/perl5/perlbrew/build/
 
 RUN cd ~/project && \
   source ~/perl5/perlbrew/etc/bashrc && \
@@ -45,17 +47,20 @@ RUN cd ~/project && \
     --with-feature=openoffice \
     --with-feature=xls \
     --with-feature=edi \
-    --installdeps .
+    --installdeps . && \
+  rm -rf ~/.cpanm
 
 RUN cd ~/project && \
   source ~/perl5/perlbrew/etc/bashrc && \
   perlbrew use perl-$perl && \
-  cpanm --quiet --notest Dancer2 Dancer2::Session::Cookie Dancer2::Plugin::Auth::Extensible \
-                         URL::Encode URL::Encode::XS \
-                         Pod::ProjectDocs \
-                         Devel::Cover Devel::Cover::Report::Coveralls \
-                         Dist::Zilla \
-                         Locale::Country
+  cpanm --quiet --notest Dancer2 Dancer2::Session::Cookie \
+      Dancer2::Plugin::Auth::Extensible \
+      URL::Encode URL::Encode::XS \
+      Pod::ProjectDocs \
+      Devel::Cover Devel::Cover::Report::Coveralls \
+      Dist::Zilla \
+      Locale::Country && \
+  rm -rf ~/.cpanm
 
 USER root
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
