@@ -12,6 +12,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y update && \
     DEBIAN_FRONTEND=noninteractive apt-get -qyy install perlbrew && \
     apt-get -qqy autoremove && \
     apt-get -qqy autoclean && \
+    echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    (wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -) && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y install postgresql-client && \
+    apt-get -qqy autoremove && \
+    apt-get -qqy autoclean && \
     rm -rf /var/lib/apt/lists/*
 
 USER circleci
@@ -48,6 +54,36 @@ RUN cd ~/project && \
     --with-feature=xls \
     --with-feature=edi \
     --installdeps . && \
+  git checkout 1.7 && \
+  cpanm --quiet --notest \
+    --with-develop \
+    --with-feature=starman \
+    --with-feature=latex-pdf-images \
+    --with-feature=latex-pdf-ps \
+    --with-feature=openoffice \
+    --with-feature=xls \
+    --with-feature=edi \
+    --installdeps . && \
+  git checkout 1.6 && \
+  cpanm --quiet --notest \
+    --with-develop \
+    --with-feature=starman \
+    --with-feature=latex-pdf-images \
+    --with-feature=latex-pdf-ps \
+    --with-feature=openoffice \
+    --with-feature=xls \
+    --with-feature=edi \
+    --installdeps . && \
+  git checkout 1.5 && \
+  cpanm --quiet --notest \
+    --with-develop \
+    --with-feature=starman \
+    --with-feature=latex-pdf-images \
+    --with-feature=latex-pdf-ps \
+    --with-feature=openoffice \
+    --with-feature=xls \
+    --with-feature=edi \
+    --installdeps . && \
   rm -rf ~/.cpanm
 
 RUN cd ~/project && \
@@ -63,13 +99,6 @@ RUN cd ~/project && \
   rm -rf ~/.cpanm
 
 USER root
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-  (wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -) && \
-  DEBIAN_FRONTEND=noninteractive apt-get -y update && \
-  DEBIAN_FRONTEND=noninteractive apt-get -y install postgresql-client && \
-  apt-get -qqy autoremove && \
-  apt-get -qqy autoclean && \
-  rm -rf /var/lib/apt/lists/*
 
 # Configure outgoing mail to use host, other run time variable defaults
 
