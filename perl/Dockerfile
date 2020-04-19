@@ -2,7 +2,7 @@ FROM        ledgersmb/ledgersmb_circleci-primary
 MAINTAINER  ylavoie@yveslavoie.com
 
 # Perl version
-ARG perl=5.28.0
+ARG perl=5.28.2
 
 ENV HOME /home/circleci
 SHELL ["/bin/bash", "-c"]
