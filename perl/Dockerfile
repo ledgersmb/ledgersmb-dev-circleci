@@ -154,6 +154,9 @@ RUN echo "perlbrew use perl-$perl" >> .profile
 
 # We don't need to install it globally after brewing Perl here
 RUN npm install uglify-js@">=2.0 <3.0"
+RUN npm --loglevel=error install --save-dev webpack webpack-cli && \
+    npm install && \
+    npm dedupe
 
 # Fix PATH
 ENV PATH $HOME/perl5/perlbrew/perls/perl-$perl/bin:$PATH
