@@ -26,7 +26,9 @@ WORKDIR $HOME
 # Build time variables
 ENV NODE_PATH /usr/lib/node_modules
 
-# Install LedgerSMB
+# Install a fresh LedgerSMB
+ADD https://api.github.com/repos/ledgersmb/ledgersmb/git/refs/heads/master \
+    /tmp/version.json
 RUN cd && \
   git clone -b master https://github.com/ledgersmb/LedgerSMB.git project
 
