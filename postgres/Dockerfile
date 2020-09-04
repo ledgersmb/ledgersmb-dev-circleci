@@ -14,5 +14,6 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get -qqy update && \
     mkdir -p /docker-entrypoint-initdb.d
 
 COPY lsmb-dev-init.sh /docker-entrypoint-initdb.d/lsmb-dev-init.sh
+RUN chmod +x /docker-entrypoint-initdb.d/lsmb-dev-init.sh
 
 USER postgres
