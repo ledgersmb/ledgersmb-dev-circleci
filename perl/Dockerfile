@@ -56,6 +56,16 @@ RUN cd ~/project && \
     --with-feature=xls \
     --with-feature=edi \
     --installdeps . && \
+  git checkout 1.8 && \
+  cpanm --quiet --notest \
+    --with-develop \
+    --with-feature=starman \
+    --with-feature=latex-pdf-images \
+    --with-feature=latex-pdf-ps \
+    --with-feature=openoffice \
+    --with-feature=xls \
+    --with-feature=edi \
+    --installdeps . && \
   git checkout 1.7 && \
   cpanm --quiet --notest \
     --with-develop \
