@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker build -t $IMAGE_NAME --build-arg perl=$DOCKER_TAG .
+docker build -t $IMAGE_NAME --build-arg perl=$DOCKER_TAG.0 .
 
