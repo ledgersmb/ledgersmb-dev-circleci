@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
+    branches: [ '*' ]
 
 #TODO: Figure out caching. See https://docs.github.com/en/actions/configuring-and-managing-workflows/caching-dependencies-to-speed-up-workflows
 
