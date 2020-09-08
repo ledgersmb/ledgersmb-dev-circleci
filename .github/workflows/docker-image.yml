@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ '*' ]
   pull_request:
     branches: [ '*' ]
 
@@ -57,7 +57,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_TOKEN }}
         repository: ${{ github.repository_owner }}/ledgersmb_circleci-perl
-        build_args: perl=${{ matrix.version }}.0
+        build_args: perl=${{ matrix.version }}
         tags: ${{ matrix.version }}
         tag_with_ref: false
         path: perl
