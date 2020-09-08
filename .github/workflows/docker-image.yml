@@ -16,14 +16,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Build and push to Docker Hub
-      uses: docker/build-push-action@v1
+      uses: whoan/docker-build-with-cache-action@v5
       with:
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_TOKEN }}
-        repository: ${{ github.repository_owner }}/ledgersmb_circleci-primary
-        tags: latest
-        tag_with_ref: false
-        path: primary
+        image_name: ${{ github.repository_owner }}/ledgersmb_circleci-primary
+        image_tag: latest
+        context: primary
+        push_git_tag: true
   browsers:
     strategy:
       matrix:
@@ -35,14 +35,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Build and push to Docker Hub
-      uses: docker/build-push-action@v1
+      uses: whoan/docker-build-with-cache-action@v5
       with:
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_TOKEN }}
-        repository: ${{ github.repository_owner }}/ledgersmb_circleci-${{ matrix.browser }}
-        tags: latest
-        tag_with_ref: false
-        path: ${{ matrix.browser }}
+        image_name: ${{ github.repository_owner }}/ledgersmb_circleci-${{ matrix.browser }}
+        image_tag: latest
+        push_git_tag: true
+        context: ${{ matrix.browser }}
   perl:
     strategy:
       matrix:
@@ -52,15 +52,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Build and push to Docker Hub
-      uses: docker/build-push-action@v1
+      uses: whoan/docker-build-with-cache-action@v5
       with:
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_TOKEN }}
-        repository: ${{ github.repository_owner }}/ledgersmb_circleci-perl
-        build_args: perl=${{ matrix.version }}
-        tags: ${{ matrix.version }}
-        tag_with_ref: false
-        path: perl
+        image_name: ${{ github.repository_owner }}/ledgersmb_circleci-perl
+        image_tag: ${{ matrix.version }}
+        build_extra_args: "--build-arg perl=${{ matrix.version }}"
+        push_git_tag: true
+        context: perl
   postgres:
     strategy:
       matrix:
@@ -71,12 +71,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Build and push to Docker Hub
-      uses: docker/build-push-action@v1
+      uses: whoan/docker-build-with-cache-action@v5
       with:
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_TOKEN }}
-        repository: ${{ github.repository_owner }}/ledgersmb_circleci-postgres
-        build_args: postgres=${{ matrix.version }}
-        tags: ${{ matrix.version }}
-        tag_with_ref: false
-        path: postgres
+        image_name: ${{ github.repository_owner }}/ledgersmb_circleci-postgres
+        image_tag: ${{ matrix.version }}
+        build_extra_args: "--build-arg postgres=${{ matrix.version }}"
+        push_git_tag: true
+        context: postgres
