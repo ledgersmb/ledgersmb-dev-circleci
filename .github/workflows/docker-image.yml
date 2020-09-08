@@ -1,0 +1,82 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ '*' ]
+
+#TODO: Figure out caching. See https://docs.github.com/en/actions/configuring-and-managing-workflows/caching-dependencies-to-speed-up-workflows
+
+jobs:
+  primary:
+    #if: ${{ github.ref }} == "primary"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build and push to Docker Hub
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+        repository: ${{ github.repository_owner }}/ledgersmb_circleci-primary
+        tags: latest
+        tag_with_ref: false
+        path: primary
+  browsers:
+    strategy:
+      matrix:
+        browser: ['chrome', 'firefox', 'phantomjs']
+    needs: primary
+    #if: ${{ github.ref == matrix.browser }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build and push to Docker Hub
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+        repository: ${{ github.repository_owner }}/ledgersmb_circleci-${{ matrix.browser }}
+        tags: latest
+        tag_with_ref: false
+        path: ${{ matrix.browser }}
+  perl:
+    strategy:
+      matrix:
+        version: ['5.24', '5.26', '5.28', '5.30']
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build and push to Docker Hub
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+        repository: ${{ github.repository_owner }}/ledgersmb_circleci-perl
+        build_args: perl=${{ matrix.version }}.0
+        tags: ${{ matrix.version }}
+        tag_with_ref: false
+        path: perl
+  postgres:
+    strategy:
+      matrix:
+        version: ['9.5', '9.6', '10', '11', '12']
+    needs: primary
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build and push to Docker Hub
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+        repository: ${{ github.repository_owner }}/ledgersmb_circleci-postgres
+        build_args: postgres=${{ matrix.version }}
+        tags: ${{ matrix.version }}
+        tag_with_ref: false
+        path: postgres
