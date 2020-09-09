@@ -2,15 +2,12 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ '*' ]
+    branches: [ master ]
   pull_request:
     branches: [ '*' ]
 
-#TODO: Figure out caching. See https://docs.github.com/en/actions/configuring-and-managing-workflows/caching-dependencies-to-speed-up-workflows
-
 jobs:
   primary:
-    #if: ${{ github.ref }} == "primary"
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -24,12 +21,12 @@ jobs:
         image_tag: latest
         context: primary
         push_git_tag: true
+        push_image_and_stages: on:push
   browsers:
     strategy:
       matrix:
         browser: ['chrome', 'firefox', 'phantomjs']
     needs: primary
-    #if: ${{ github.ref == matrix.browser }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -43,6 +40,7 @@ jobs:
         image_tag: latest
         push_git_tag: true
         context: ${{ matrix.browser }}
+        push_image_and_stages: on:push
   perl:
     strategy:
       matrix:
@@ -62,6 +60,7 @@ jobs:
         push_git_tag: true
         context: perl
         stages_image_name: "${{ github.repository_owner }}/ledgersmb_circleci-perl-${{ matrix.version }}-stages"
+        push_image_and_stages: on:push
   postgres:
     strategy:
       matrix:
@@ -82,3 +81,4 @@ jobs:
         push_git_tag: true
         context: postgres
         stages_image_name: "${{ github.repository_owner }}/ledgersmb_circleci-postgres-${{ matrix.version }}-stages"
+        push_image_and_stages: on:push
