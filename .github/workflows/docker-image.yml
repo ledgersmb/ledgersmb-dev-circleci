@@ -61,6 +61,7 @@ jobs:
         build_extra_args: "--build-arg perl=${{ matrix.version }}"
         push_git_tag: true
         context: perl
+        stages_image_name: "${{ github.repository_owner }}/ledgersmb_circleci-perl-${{ matrix.version }}-stages"
   postgres:
     strategy:
       matrix:
@@ -80,3 +81,4 @@ jobs:
         build_extra_args: "--build-arg postgres=${{ matrix.version }}"
         push_git_tag: true
         context: postgres
+        stages_image_name: "${{ github.repository_owner }}/ledgersmb_circleci-postgres-${{ matrix.version }}-stages"
