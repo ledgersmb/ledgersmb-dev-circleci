@@ -222,7 +222,7 @@ RUN cd ~/project && \
 RUN if [[ "$perl" > "5.27.999" && "$perl" < "5.29" ]] ; then \
   cpm install --local-lib-contained=~/perl5 --no-test \
       B::Debug \
-  rm -rf ~/.cpanm;
+  rm -rf ~/.cpanm; \
   fi
 
 
