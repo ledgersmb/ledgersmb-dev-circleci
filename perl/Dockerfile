@@ -170,7 +170,7 @@ RUN cd ~/project && \
 # Use App::cpm to run cpan in parallel
 RUN cd ~/project && \
   cpm install --local-lib-contained=~/perl5 --no-test \
-    --with-develop \
+	--with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
     --feature=openoffice \
@@ -178,7 +178,7 @@ RUN cd ~/project && \
     --feature=edi && \
   git checkout 1.8 && \
   cpm install --local-lib-contained=~/perl5 --no-test \
-    --with-develop \
+	--with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
     --feature=openoffice \
@@ -186,7 +186,7 @@ RUN cd ~/project && \
     --feature=edi && \
   git checkout 1.7 && \
   cpm install --local-lib-contained=~/perl5 --no-test \
-    --with-develop \
+	--with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
     --feature=openoffice \
@@ -194,7 +194,7 @@ RUN cd ~/project && \
     --feature=edi && \
   git checkout 1.6 && \
   cpm install --local-lib-contained=~/perl5 --no-test \
-    --with-develop \
+	--with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
     --feature=openoffice \
@@ -202,7 +202,7 @@ RUN cd ~/project && \
     --feature=edi && \
   git checkout 1.5 && \
   cpm install --local-lib-contained=~/perl5 --no-test \
-    --with-develop \
+	--with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
     --feature=openoffice \
@@ -211,7 +211,7 @@ RUN cd ~/project && \
 
 RUN cd ~/project && \
   cpm install --local-lib-contained=~/perl5 --no-test \
-      Starman \
+		  Starman \
       URL::Encode URL::Encode::XS \
       Pod::ProjectDocs \
       Devel::Cover Devel::Cover::Report::Coveralls \
@@ -220,8 +220,9 @@ RUN cd ~/project && \
   rm -rf ~/.cpanm
 
 RUN if [[ "$perl" > "5.27.999" && "$perl" < "5.29" ]] ; then \
+    cd ~/project && \
   cpm install --local-lib-contained=~/perl5 --no-test \
-      B::Debug \
+        B::Debug && \
   rm -rf ~/.cpanm; \
   fi
 
