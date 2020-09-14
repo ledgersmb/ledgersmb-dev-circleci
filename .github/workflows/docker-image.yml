@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ '*' ]
+    branches: [ 'ylavoie/**' ]
 
 jobs:
   primary:
@@ -21,7 +21,7 @@ jobs:
         image_tag: latest
         context: primary
         push_git_tag: true
-        push_image_and_stages: on:push
+        push_image_and_stages: true
   browsers:
     strategy:
       matrix:
@@ -40,7 +40,7 @@ jobs:
         image_tag: latest
         push_git_tag: true
         context: ${{ matrix.browser }}
-        push_image_and_stages: on:push
+        push_image_and_stages: true
   perl:
     strategy:
       matrix:
@@ -60,7 +60,7 @@ jobs:
         push_git_tag: true
         context: perl
         stages_image_name: "${{ github.repository_owner }}/ledgersmb_circleci-perl-${{ matrix.version }}-stages"
-        push_image_and_stages: on:push
+        push_image_and_stages: true
   postgres:
     strategy:
       matrix:
@@ -81,4 +81,4 @@ jobs:
         push_git_tag: true
         context: postgres
         stages_image_name: "${{ github.repository_owner }}/ledgersmb_circleci-postgres-${{ matrix.version }}-stages"
-        push_image_and_stages: on:push
+        push_image_and_stages: true
