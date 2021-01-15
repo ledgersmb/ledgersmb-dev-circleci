@@ -163,13 +163,13 @@ ADD https://api.github.com/repos/ledgersmb/ledgersmb/git/refs/heads/master \
 RUN cd && \
   git clone -b master https://github.com/ledgersmb/LedgerSMB.git project
 
-RUN cd ~/project && \
-    cpanm --local-lib=~/perl5 -nq App::cpm inc::Module::Install && \
-    perl -Mlocal::lib  >> ~/.profile
+RUN cd $HOME/project && \
+    cpanm --local-lib=$HOME/perl5 -nq App::cpm inc::Module::Install && \
+    perl -Mlocal::lib  >> $HOME/.profile
 
 # Use App::cpm to run cpan in parallel
-RUN cd ~/project && \
-  cpm install --local-lib-contained=~/perl5 --no-test \
+RUN cd $HOME/project && \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
     --with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
@@ -177,7 +177,7 @@ RUN cd ~/project && \
     --feature=xls \
     --feature=edi && \
   git checkout 1.8 && \
-  cpm install --local-lib-contained=~/perl5 --no-test \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
     --with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
@@ -185,7 +185,7 @@ RUN cd ~/project && \
     --feature=xls \
     --feature=edi && \
   git checkout 1.7 && \
-  cpm install --local-lib-contained=~/perl5 --no-test \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
     --with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
@@ -193,7 +193,7 @@ RUN cd ~/project && \
     --feature=xls \
     --feature=edi && \
   git checkout 1.6 && \
-  cpm install --local-lib-contained=~/perl5 --no-test \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
     --with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
@@ -201,28 +201,29 @@ RUN cd ~/project && \
     --feature=xls \
     --feature=edi && \
   git checkout 1.5 && \
-  cpm install --local-lib-contained=~/perl5 --no-test \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
     --with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
     --feature=openoffice \
     --feature=edi && \
-  rm -rf ~/.cpanm
+  rm -rf $HOME/.cpanm
 
-RUN cd ~/project && \
-  cpm install --local-lib-contained=~/perl5 --no-test \
+RUN cd $HOME/project && \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
       Starman \
       URL::Encode URL::Encode::XS \
       Pod::ProjectDocs \
       Devel::Cover Devel::Cover::Report::Coveralls \
       Dist::Zilla \
       Locale::Country && \
-  rm -rf ~/.cpanm
+  rm -rf $HOME/.cpanm
 
 RUN if [[ "$perl" > "5.27.999" && "$perl" < "5.29" ]] ; then \
-  cpm install --local-lib-contained=~/perl5 --no-test \
-      B::Debug \
-  rm -rf ~/.cpanm; \
+    cd $HOME/project && \
+    cpm install --local-lib-contained=$HOME/perl5 --no-test \
+        B::Debug && \
+    rm -rf $HOME/.cpanm; \
   fi
 
 
