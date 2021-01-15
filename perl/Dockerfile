@@ -115,7 +115,6 @@ RUN groupadd --gid 3434 circleci \
   && echo 'Defaults    env_keep += "DEBIAN_FRONTEND"' >> /etc/sudoers.d/env_keep
 
 #CircleCI--
-ARG HOME=/home/circleci
 
 # Install browsers++
 # Copied from https://github.com/CircleCI-Public/circleci-dockerfiles/blob/master/node/images/15.2.1-stretch/browsers/Dockerfile
