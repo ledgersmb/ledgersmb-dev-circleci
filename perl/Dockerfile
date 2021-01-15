@@ -64,7 +64,7 @@ RUN apt-get update && apt-get -y install gnupg2 \
     libclass-trigger-perl libclass-accessor-lite-perl libtest-requires-perl \
     libmodule-install-perl python3-setuptools libdist-zilla-perl \
     python3-pip python3-urllib3 \
-    locales sudo && \
+    locales sudo jq && \
   apt-get -qqy autoremove && \
   apt-get -qqy autoclean && \
   rm -rf /var/lib/apt/lists/*
@@ -116,6 +116,73 @@ RUN groupadd --gid 3434 circleci \
 
 #CircleCI--
 
+# Install browsers++
+# Copied from https://github.com/CircleCI-Public/circleci-dockerfiles/blob/master/node/images/15.2.1-stretch/browsers/Dockerfile
+#
+# Install Java 11 LTS / OpenJDK 11
+#
+RUN if grep -q Debian /etc/os-release && grep -q stretch /etc/os-release; then \
+		echo 'deb http://deb.debian.org/debian stretch-backports main' | sudo tee -a /etc/apt/sources.list.d/stretch-backports.list; \
+	elif grep -q Ubuntu /etc/os-release && grep -q xenial /etc/os-release; then \
+		sudo apt-get update && sudo apt-get install -y software-properties-common && \
+		sudo add-apt-repository -y ppa:openjdk-r/ppa; \
+	fi && \
+	sudo apt-get update && sudo apt-get install -y openjdk-11-jre openjdk-11-jre-headless openjdk-11-jdk openjdk-11-jdk-headless && \
+	sudo apt-get install -y bzip2 libgconf-2-4 # for extracting firefox and running chrome, respectively
+
+# install firefox
+#
+RUN FIREFOX_URL="https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US" \
+  && ACTUAL_URL=$(curl -Ls -o /dev/null -w %{url_effective} $FIREFOX_URL) \
+  && curl --silent --show-error --location --fail --retry 3 --output /tmp/firefox.tar.bz2 $ACTUAL_URL \
+  && sudo tar -xvjf /tmp/firefox.tar.bz2 -C /opt \
+  && sudo ln -s /opt/firefox/firefox /usr/local/bin/firefox \
+  && sudo apt-get install -y libgtk3.0-cil-dev libasound2 libasound2 libdbus-glib-1-2 libdbus-1-3 \
+  && rm -rf /tmp/firefox.* \
+  && firefox --version
+
+# install geckodriver
+
+RUN export GECKODRIVER_LATEST_RELEASE_URL=$(curl https://api.github.com/repos/mozilla/geckodriver/releases/latest | jq -r ".assets[] | select(.name | test(\"linux64.tar.gz$\")) | .browser_download_url") \
+     && curl --silent --show-error --location --fail --retry 3 --output /tmp/geckodriver_linux64.tar.gz "$GECKODRIVER_LATEST_RELEASE_URL" \
+     && cd /tmp \
+     && tar xf geckodriver_linux64.tar.gz \
+     && rm -rf geckodriver_linux64.tar.gz \
+     && sudo mv geckodriver /usr/local/bin/geckodriver \
+     && sudo chmod +x /usr/local/bin/geckodriver \
+     && geckodriver --version
+
+# install chrome
+
+RUN cd /tmp && wget -O google-chrome-stable_current_amd64.deb -t 5 "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" \
+    && (sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get -fy install)  \
+    && rm -rf google-chrome-stable_current_amd64.deb \
+    && sudo sed -i 's|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox --no-sandbox|g' \
+        "/opt/google/chrome/google-chrome" \
+    && google-chrome --version
+
+RUN CHROME_VERSION="$(google-chrome --version)" \
+    && export CHROMEDRIVER_RELEASE="$(echo $CHROME_VERSION | sed 's/^Google Chrome //')" && export CHROMEDRIVER_RELEASE=${CHROMEDRIVER_RELEASE%%.*} \
+    && CHROMEDRIVER_VERSION=$(curl --silent --show-error --location --fail --retry 4 --retry-delay 5 http://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROMEDRIVER_RELEASE}) \
+    && curl --silent --show-error --location --fail --retry 4 --retry-delay 5 --output /tmp/chromedriver_linux64.zip "http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip" \
+    && cd /tmp \
+    && unzip chromedriver_linux64.zip \
+    && rm -rf chromedriver_linux64.zip \
+    && sudo mv chromedriver /usr/local/bin/chromedriver \
+    && sudo chmod +x /usr/local/bin/chromedriver \
+    && chromedriver --version
+
+# Install PhantomJS
+
+RUN PHANTOMJS_URL="https://circle-downloads.s3.amazonaws.com/circleci-images/cache/linux-amd64/phantomjs-latest.tar.bz2" \
+  && sudo apt-get install libfontconfig \
+  && curl --silent --show-error --location --fail --retry 3 --output /tmp/phantomjs.tar.bz2 ${PHANTOMJS_URL} \
+  && tar -x -C /tmp -f /tmp/phantomjs.tar.bz2 \
+  && sudo mv /tmp/phantomjs-*-linux-x86_64/bin/phantomjs /usr/local/bin \
+  && rm -rf /tmp/phantomjs.tar.bz2 /tmp/phantomjs-*
+
+# Install browsers--
+
 COPY start.sh /usr/local/bin/start.sh
 
 RUN chmod +x /usr/local/bin/start.sh && \
@@ -163,13 +230,13 @@ ADD https://api.github.com/repos/ledgersmb/ledgersmb/git/refs/heads/master \
 RUN cd && \
   git clone -b master https://github.com/ledgersmb/LedgerSMB.git project
 
-RUN cd ~/project && \
-    cpanm --local-lib=~/perl5 -nq App::cpm inc::Module::Install && \
-    perl -Mlocal::lib  >> ~/.profile
+RUN cd $HOME/project && \
+    cpanm --local-lib=$HOME/perl5 -nq App::cpm inc::Module::Install && \
+    perl -Mlocal::lib  >> $HOME/.profile
 
 # Use App::cpm to run cpan in parallel
-RUN cd ~/project && \
-  cpm install --local-lib-contained=~/perl5 --no-test \
+RUN cd $HOME/project && \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
     --with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
@@ -177,7 +244,7 @@ RUN cd ~/project && \
     --feature=xls \
     --feature=edi && \
   git checkout 1.8 && \
-  cpm install --local-lib-contained=~/perl5 --no-test \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
     --with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
@@ -185,7 +252,7 @@ RUN cd ~/project && \
     --feature=xls \
     --feature=edi && \
   git checkout 1.7 && \
-  cpm install --local-lib-contained=~/perl5 --no-test \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
     --with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
@@ -193,7 +260,7 @@ RUN cd ~/project && \
     --feature=xls \
     --feature=edi && \
   git checkout 1.6 && \
-  cpm install --local-lib-contained=~/perl5 --no-test \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
     --with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
@@ -201,28 +268,29 @@ RUN cd ~/project && \
     --feature=xls \
     --feature=edi && \
   git checkout 1.5 && \
-  cpm install --local-lib-contained=~/perl5 --no-test \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
     --with-develop \
     --feature=starman \
     --feature=latex-pdf-ps \
     --feature=openoffice \
     --feature=edi && \
-  rm -rf ~/.cpanm
+  rm -rf $HOME/.cpanm
 
-RUN cd ~/project && \
-  cpm install --local-lib-contained=~/perl5 --no-test \
+RUN cd $HOME/project && \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
       Starman \
       URL::Encode URL::Encode::XS \
       Pod::ProjectDocs \
       Devel::Cover Devel::Cover::Report::Coveralls \
       Dist::Zilla \
       Locale::Country && \
-  rm -rf ~/.cpanm
+  rm -rf $HOME/.cpanm
 
 RUN if [[ "$perl" > "5.27.999" && "$perl" < "5.29" ]] ; then \
-  cpm install --local-lib-contained=~/perl5 --no-test \
-      B::Debug \
-  rm -rf ~/.cpanm; \
+    cd $HOME/project && \
+    cpm install --local-lib-contained=$HOME/perl5 --no-test \
+        B::Debug && \
+    rm -rf $HOME/.cpanm; \
   fi
 
 
