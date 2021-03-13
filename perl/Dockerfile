@@ -212,7 +212,7 @@ RUN chmod +x /usr/local/bin/lighttpd.sh
 # Remove startup warnings
 RUN chown circleci:circleci -R /var/log/nginx /var/log/lighttpd
 
-RUN wget --quiet -O - https://deb.nodesource.com/setup_14.x | bash - && \
+RUN wget --quiet -O - https://deb.nodesource.com/setup_15.x | bash - && \
     apt-get install -y nodejs
 
 ENV HOME /home/circleci
