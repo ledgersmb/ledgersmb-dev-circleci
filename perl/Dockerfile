@@ -64,7 +64,7 @@ RUN apt-get update && apt-get -y install gnupg2 \
     libclass-trigger-perl libclass-accessor-lite-perl libtest-requires-perl \
     libmodule-install-perl python3-setuptools libdist-zilla-perl \
     python3-pip python3-urllib3 \
-    locales sudo jq && \
+    locales sudo jq bc gnuplot && \
   apt-get -qqy autoremove && \
   apt-get -qqy autoclean && \
   rm -rf /var/lib/apt/lists/*
@@ -212,7 +212,7 @@ RUN chmod +x /usr/local/bin/lighttpd.sh
 # Remove startup warnings
 RUN chown circleci:circleci -R /var/log/nginx /var/log/lighttpd
 
-RUN wget --quiet -O - https://deb.nodesource.com/setup_14.x | bash - && \
+RUN wget --quiet -O - https://deb.nodesource.com/setup_15.x | bash - && \
     apt-get install -y nodejs
 
 ENV HOME /home/circleci

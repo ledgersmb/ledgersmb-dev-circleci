@@ -44,7 +44,7 @@ jobs:
   perl:
     strategy:
       matrix:
-        version: ['5.24', '5.26', '5.28', '5.30', '5.32']
+        version: ['5.26', '5.28', '5.30', '5.32']
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
