@@ -2,9 +2,11 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ master, 'ylavoie/**' ]
+    branches-ignore:
+      - 'master'
   pull_request:
-    branches: [ 'ylavoie/**' ]
+    branches:
+      - 'master'
 
 jobs:
   primary:
