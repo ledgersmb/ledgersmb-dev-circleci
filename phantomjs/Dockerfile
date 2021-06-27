@@ -1,4 +1,4 @@
-FROM ledgersmb/ledgersmb_circleci-primary
+FROM ledgersmbdev/ledgersmb_circleci-primary
 
 ## install phantomjs
 #
