@@ -18,26 +18,6 @@ jobs:
         context: primary
         push_git_tag: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
         push_image_and_stages: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
-  browsers:
-    strategy:
-      matrix:
-        browser: ['chrome', 'firefox', 'phantomjs']
-    needs: primary
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Build and push to Docker Hub
-      uses: whoan/docker-build-with-cache-action@v5
-      with:
-        username: ${{ github.actor }}
-        password: ${{ secrets.DOCKER_TOKEN }}
-        image_name: ${{ github.repository_owner }}dev/ledgersmb_circleci-browsers
-        image_tag: ${{ matrix.browser }}
-        push_git_tag: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
-        context: ${{ matrix.browser }}
-        stages_image_name: "${{ github.repository_owner }}dev/ledgersmb_circleci-browsers-${{ matrix.browser }}-stages"
-        push_image_and_stages: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
   perl:
     strategy:
       matrix:
