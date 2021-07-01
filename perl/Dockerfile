@@ -63,7 +63,7 @@ RUN apt-get update && apt-get -y install gnupg2 \
     libperl-critic-perl libmodule-cpanfile-perl libfile-util-perl \
     libclass-trigger-perl libclass-accessor-lite-perl libtest-requires-perl \
     libmodule-install-perl python3-setuptools libdist-zilla-perl \
-    python3-pip python3-urllib3 \
+    python3-pip python3-wheel python3-urllib3 \
     locales sudo jq bc gnuplot && \
   apt-get -qqy autoremove && \
   apt-get -qqy autoclean && \
