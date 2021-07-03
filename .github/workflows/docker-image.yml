@@ -16,8 +16,8 @@ jobs:
         image_name: ${{ github.repository_owner }}dev/ledgersmb_circleci-primary
         image_tag: latest
         context: primary
-        push_git_tag: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
-        push_image_and_stages: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        push_git_tag: ${{ github.event.pull_request.merged }}
+        push_image_and_stages: ${{ github.event.pull_request.merged }}
   browsers:
     strategy:
       matrix:
@@ -34,10 +34,10 @@ jobs:
         password: ${{ secrets.DOCKER_TOKEN }}
         image_name: ${{ github.repository_owner }}dev/ledgersmb_circleci-browsers
         image_tag: ${{ matrix.browser }}
-        push_git_tag: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        push_git_tag: ${{ github.event.pull_request.merged }}
         context: ${{ matrix.browser }}
         stages_image_name: "${{ github.repository_owner }}dev/ledgersmb_circleci-browsers-${{ matrix.browser }}-stages"
-        push_image_and_stages: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        push_image_and_stages: ${{ github.event.pull_request.merged }}
   perl:
     strategy:
       matrix:
@@ -54,10 +54,10 @@ jobs:
         image_name: ${{ github.repository_owner }}dev/ledgersmb_circleci-perl
         image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg perl=${{ matrix.version }}"
-        push_git_tag: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        push_git_tag: ${{ github.event.pull_request.merged }}
         context: perl
         stages_image_name: "${{ github.repository_owner }}dev/ledgersmb_circleci-perl-${{ matrix.version }}-stages"
-        push_image_and_stages: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        push_image_and_stages: ${{ github.event.pull_request.merged }}
   postgres:
     strategy:
       matrix:
@@ -75,7 +75,7 @@ jobs:
         image_name: ${{ github.repository_owner }}dev/ledgersmb_circleci-postgres
         image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg postgres=${{ matrix.version }}"
-        push_git_tag: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        push_git_tag: ${{ github.event.pull_request.merged }}
         context: postgres
         stages_image_name: "${{ github.repository_owner }}dev/ledgersmb_circleci-postgres-${{ matrix.version }}-stages"
-        push_image_and_stages: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        push_image_and_stages: ${{ github.event.pull_request.merged }}
