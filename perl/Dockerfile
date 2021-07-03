@@ -144,6 +144,14 @@ RUN cd $HOME/project && \
     --feature=openoffice \
     --feature=xls \
     --feature=edi && \
+  git checkout 1.9 && \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test \
+    --with-develop \
+    --feature=starman \
+    --feature=latex-pdf-ps \
+    --feature=openoffice \
+    --feature=xls \
+    --feature=edi && \
   git checkout 1.8 && \
   cpm install --local-lib-contained=$HOME/perl5 --no-test \
     --with-develop \
