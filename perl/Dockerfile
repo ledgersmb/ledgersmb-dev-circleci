@@ -1,5 +1,5 @@
 # Perl default version
-ARG perl=5.28
+ARG perl=5.32
 
 FROM        perldocker/perl-tester:$perl
 LABEL       maintainer="ylavoie@yveslavoie.com"
