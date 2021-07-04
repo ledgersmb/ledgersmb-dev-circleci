@@ -17,13 +17,8 @@ RUN echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/90circleci \
   && echo 'DPkg::Options "--force-confnew";' >> /etc/apt/apt.conf.d/90circleci
 
 RUN echo 'APT::Install-Recommends "0";' 'APT::Install-Suggests "0";' \
-       >> /etc/apt/apt.conf && \
-  echo "deb http://http.debian.net/debian/ sid main non-free contrib" >> /etc/apt/sources.list && \
-  apt-get update && \
-  apt-get -y upgrade
-
-RUN  apt-get -y install \
-    gnupg \
+       >> /etc/apt/apt.conf
+RUN apt-get update && apt-get -y install gnupg2 \
     libauthen-sasl-perl libcgi-emulate-psgi-perl libconfig-inifiles-perl \
     libcookie-baker-perl libdbd-pg-perl libdbi-perl libdata-uuid-perl \
     libdatetime-perl libdatetime-format-strptime-perl \
@@ -73,10 +68,6 @@ RUN  apt-get -y install \
   apt-get -y update && \
   apt-get -y install nodejs postgresql-client
 
-# Including postgresql-autodoc in the above total lump didn't work;
-#   splitting out did...
-RUN apt-get -y -t sid install postgresql-autodoc
-
 # Additional (testing) dependencies up to and including 1.9
 RUN apt-get -y install libpath-class-perl libtype-tiny-perl libtype-tiny-xs-perl libclass-factory-perl libyaml-syck-perl libmoox-handlesvia-perl libpod-coverage-perl libhash-merge-perl libpod-pom-perl libfile-share-perl libtext-diff-perl libhtml-selector-xpath-perl libtest-pod-perl libdbd-mock-perl libx12-parser-perl liblog-any-adapter-log4perl-perl libtest-pod-coverage-perl
 
@@ -91,6 +82,10 @@ RUN apt-get -y install liblist-someutils-perl libtest-warn-perl libtest-most-per
 
 RUN apt-get -y install locales sudo jq bc gnuplot \
     docker.io docker-compose
+
+# Including postgresql-autodoc in the above total lump didn't work;
+#   splitting out did...
+RUN apt-get -y install postgresql-autodoc
 
 #CircleCI++, copied from CircleCI-Node:14.9.0-buster
 
@@ -152,6 +147,9 @@ RUN cd $HOME/project && \
     cpanm --local-lib=$HOME/perl5 -nq App::cpm inc::Module::Install && \
     perl -Mlocal::lib  >> $HOME/.profile
 
+# FROM resets ARG, so redeclare
+ARG branches
+
 # Use App::cpm to run cpan in parallel
 RUN bash -c 'for branch in ${branches//,/ }; do \
     cd $HOME/project && \
@@ -174,6 +172,14 @@ RUN cd $HOME/project && \
       DBD::Mock \
       Devel::Cover Devel::Cover::Report::Coveralls && \
   rm -rf $HOME/.cpanm
+
+RUN if [[ "$perl" > "5.27.999" && "$perl" < "5.29" ]] ; then \
+    cd $HOME/project && \
+    cpm install --local-lib-contained=$HOME/perl5 --no-test \
+        B::Debug && \
+    rm -rf $HOME/.cpanm; \
+  fi
+
 
 RUN npm --loglevel=error install --save-dev webpack webpack-cli && \
     npm install && \
