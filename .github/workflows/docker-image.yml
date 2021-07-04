@@ -40,7 +40,15 @@ jobs:
   perl:
     strategy:
       matrix:
-        version: ['5.32', '5.34']
+        include:
+          - version: "5.34"
+            branches: "master,1.9,1.8,1.7,1.6"
+          - version: "5.32"
+            branches: "master,1.9,1.8,1.7,1.6"
+          - version: "5.30"
+            branches: "1.8,1.7,1.6"
+          - version: "5.28"
+            branches: "1.7,1.6"
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -52,7 +60,7 @@ jobs:
         password: ${{ secrets.DOCKER_TOKEN }}
         image_name: ${{ github.repository_owner }}dev/ledgersmb_circleci-perl
         image_tag: ${{ matrix.version }}
-        build_extra_args: "--build-arg perl=${{ matrix.version }}"
+        build_extra_args: "--build-arg perl=${{ matrix.version }} --build-arg branches=${{ matrix.branches }}"
         push_git_tag: ${{ github.event.pull_request.merged }}
         context: perl
         pull_image_and_stages: false

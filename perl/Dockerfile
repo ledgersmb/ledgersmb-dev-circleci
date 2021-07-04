@@ -1,5 +1,6 @@
 # Perl default version
 ARG perl=5.32
+ARG branches="master,1.9,1.8,1.7,1.6"
 
 FROM        perldocker/perl-tester:$perl
 LABEL       maintainer="ylavoie@yveslavoie.com"
@@ -17,13 +18,11 @@ RUN echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/90circleci \
 
 RUN echo 'APT::Install-Recommends "0";' 'APT::Install-Suggests "0";' \
        >> /etc/apt/apt.conf && \
+  echo "deb http://http.debian.net/debian/ sid main non-free contrib" >> /etc/apt/sources.list && \
   apt-get update && \
-  apt-get -y install curl ca-certificates wget gnupg2 && \
-  curl -L https://deb.nodesource.com/setup_16.x -o ./setup && \
-  bash ./setup && rm ./setup && \
-  apt-get -y update && \
-  apt-get -y upgrade && \
-  apt-get -y install \
+  apt-get -y upgrade
+
+RUN  apt-get -y install \
     gnupg \
     libauthen-sasl-perl libcgi-emulate-psgi-perl libconfig-inifiles-perl \
     libcookie-baker-perl libdbd-pg-perl libdbi-perl libdata-uuid-perl \
@@ -54,26 +53,44 @@ RUN echo 'APT::Install-Recommends "0";' 'APT::Install-Suggests "0";' \
     libclass-c3-xs-perl liblocale-codes-perl \
     texlive-latex-recommended texlive-fonts-recommended \
     texlive-xetex fonts-liberation \
-    lsb-release \
-    git cpanminus make gcc nodejs libperl-dev lsb-release libcarp-always-perl \
-    ssh tar gzip \
+    git cpanminus make gcc libperl-dev libcarp-always-perl \
+    ssh tar gzip graphviz \
     gettext procps libtap-parser-sourcehandler-pgtap-perl \
+    libtest2-suite-perl libfile-mimeinfo-perl libhtml-lint-perl \
+    libpod-projectdocs-perl libyaml-perl \
     libtest-dependencies-perl libtest-exception-perl libtest-trap-perl \
     libperl-critic-perl libmodule-cpanfile-perl libfile-util-perl \
     libclass-trigger-perl libclass-accessor-lite-perl libtest-requires-perl \
     libmodule-install-perl python3-setuptools libdist-zilla-perl \
-    python3-pip python3-urllib3 \
-    locales sudo jq bc gnuplot \
-    docker.io docker-compose && \
+    python3-pip python3-wheel python3-urllib3 && \
   pip3 install transifex-client && \
   pip3 install --upgrade urllib3 && \
+  apt-get -y install curl ca-certificates wget gnupg2 lsb-release && \
+  (curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -) && \
+  echo "deb https://deb.nodesource.com/node_16.x $(lsb_release -s -c) main" | tee /etc/apt/sources.list.d/nodesource.list  && \
   echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
   (wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -) && \
   apt-get -y update && \
-  apt-get -y install postgresql-client && \
-  apt-get -qqy autoremove && \
-  apt-get -qqy autoclean && \
-  rm -rf /var/lib/apt/lists/*
+  apt-get -y install nodejs postgresql-client
+
+# Including postgresql-autodoc in the above total lump didn't work;
+#   splitting out did...
+RUN apt-get -y -t sid install postgresql-autodoc
+
+# Additional (testing) dependencies up to and including 1.9
+RUN apt-get -y install libpath-class-perl libtype-tiny-perl libtype-tiny-xs-perl libclass-factory-perl libyaml-syck-perl libmoox-handlesvia-perl libpod-coverage-perl libhash-merge-perl libpod-pom-perl libfile-share-perl libtext-diff-perl libhtml-selector-xpath-perl libtest-pod-perl libdbd-mock-perl libx12-parser-perl liblog-any-adapter-log4perl-perl libtest-pod-coverage-perl
+
+# Additional dependency up to and including 1.7
+RUN apt-get -y install libmime-lite-perl
+
+# Additional dependency up to and including 1.5
+RUN apt-get -y install libcgi-simple-perl libhttp-exception-perl libtest-nowarnings-perl
+
+# Additional dependency up to and including 1.6
+RUN apt-get -y install liblist-someutils-perl libtest-warn-perl libtest-most-perl libtest-differences-perl libparallel-forkmanager-perl libmodule-util-perl
+
+RUN apt-get -y install locales sudo jq bc gnuplot \
+    docker.io docker-compose
 
 #CircleCI++, copied from CircleCI-Node:14.9.0-buster
 
@@ -136,63 +153,26 @@ RUN cd $HOME/project && \
     perl -Mlocal::lib  >> $HOME/.profile
 
 # Use App::cpm to run cpan in parallel
-RUN cd $HOME/project && \
-  cpm install --local-lib-contained=$HOME/perl5 --no-test \
-    --with-develop \
-    --feature=starman \
-    --feature=latex-pdf-ps \
-    --feature=openoffice \
-    --feature=xls \
-    --feature=edi && \
-  git checkout 1.9 && \
-  cpm install --local-lib-contained=$HOME/perl5 --no-test \
-    --with-develop \
-    --feature=starman \
-    --feature=latex-pdf-ps \
-    --feature=openoffice \
-    --feature=xls \
-    --feature=edi && \
-  git checkout 1.8 && \
-  cpm install --local-lib-contained=$HOME/perl5 --no-test \
-    --with-develop \
-    --feature=starman \
-    --feature=latex-pdf-ps \
-    --feature=openoffice \
-    --feature=xls \
-    --feature=edi && \
-  git checkout 1.7 && \
-  cpm install --local-lib-contained=$HOME/perl5 --no-test \
-    --with-develop \
-    --feature=starman \
-    --feature=latex-pdf-ps \
-    --feature=openoffice \
-    --feature=xls \
-    --feature=edi && \
-  git checkout 1.6 && \
-  cpm install --local-lib-contained=$HOME/perl5 --no-test \
-    --with-develop \
-    --feature=starman \
-    --feature=latex-pdf-ps \
-    --feature=openoffice \
-    --feature=xls \
-    --feature=edi && \
-  git checkout 1.5 && \
-  cpm install --local-lib-contained=$HOME/perl5 --no-test \
-    --with-develop \
-    --feature=starman \
-    --feature=latex-pdf-ps \
-    --feature=openoffice \
-    --feature=edi && \
-  rm -rf $HOME/.cpanm
+RUN bash -c 'for branch in ${branches//,/ }; do \
+    cd $HOME/project && \
+    git checkout $branch && \
+    cpm install --local-lib-contained=$HOME/perl5 --no-test \
+      --with-develop \
+      --feature=starman \
+      --feature=latex-pdf-ps \
+      --feature=openoffice \
+      --feature=xls \
+      --feature=edi; \
+  done'
+RUN rm -rf $HOME/.cpanm
 
 RUN cd $HOME/project && \
   cpm install --local-lib-contained=$HOME/perl5 --no-test \
       Starman \
       URL::Encode URL::Encode::XS \
       Pod::ProjectDocs \
-      Devel::Cover Devel::Cover::Report::Coveralls \
-      Dist::Zilla \
-      Locale::Country && \
+      DBD::Mock \
+      Devel::Cover Devel::Cover::Report::Coveralls && \
   rm -rf $HOME/.cpanm
 
 RUN npm --loglevel=error install --save-dev webpack webpack-cli && \
