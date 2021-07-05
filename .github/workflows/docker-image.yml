@@ -64,13 +64,13 @@ jobs:
       matrix:
         include:
           - version: "5.34"
-            branches: "master,1.9,1.8,1.7,1.6"
+            branches: "1.6,1.7,1.8,1.9,master"
           - version: "5.32"
-            branches: "master,1.9,1.8,1.7,1.6"
+            branches: "1.6,1.7,1.8,1.9,master"
           - version: "5.30"
-            branches: "1.8,1.7,1.6"
+            branches: "1.6,1.7,1.8"
           - version: "5.28"
-            branches: "1.7,1.6"
+            branches: "1.6,1.7"
     runs-on: ubuntu-latest
     needs: repository
     steps:
