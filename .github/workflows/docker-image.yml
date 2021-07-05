@@ -3,8 +3,24 @@ name: Docker Image CI
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
+  repository:
+    runs-on: ubuntu-latest
+    outputs:
+      hub: ${{ steps.docker_hub.outputs.hub }}
+    steps:
+      - name: Use proper Docker hub
+        id: docker_hub
+        shell: bash
+        run: |
+          if [ "${{ github.repository_owner }}" == "ledgersmb" ]; then
+            echo ::set-output name=hub::ledgersmbdev
+          else
+            echo ::set-output name=hub::${{ github.repository_owner }}
+          fi
+
   primary:
     runs-on: ubuntu-latest
+    needs: repository
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -13,16 +29,20 @@ jobs:
       with:
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_TOKEN }}
-        image_name: ${{ github.repository_owner }}dev/ledgersmb_circleci-primary
+        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-primary
         image_tag: latest
         context: primary
-        push_git_tag: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
-        push_image_and_stages: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        push_git_tag: ${{ github.event.pull_request.merged }}
+        pull_image_and_stages: false
+        push_image_and_stages: false
+
   browsers:
     strategy:
       matrix:
-        browser: ['chrome', 'firefox', 'phantomjs']
-    needs: primary
+        browser: ['phantomjs']
+    needs:
+      - repository
+      - primary
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -32,16 +52,27 @@ jobs:
       with:
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_TOKEN }}
-        image_name: ${{ github.repository_owner }}dev/ledgersmb_circleci-${{ matrix.browser }}
-        image_tag: latest
-        push_git_tag: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-browsers
+        image_tag: ${{ matrix.browser }}
+        push_git_tag: ${{ github.event.pull_request.merged }}
         context: ${{ matrix.browser }}
-        push_image_and_stages: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        pull_image_and_stages: false
+        push_image_and_stages: false
+
   perl:
     strategy:
       matrix:
-        version: ['5.28', '5.30', '5.32', '5.34']
+        include:
+          - version: "5.34"
+            branches: "master,1.9,1.8,1.7,1.6"
+          - version: "5.32"
+            branches: "master,1.9,1.8,1.7,1.6"
+          - version: "5.30"
+            branches: "1.8,1.7,1.6"
+          - version: "5.28"
+            branches: "1.7,1.6"
     runs-on: ubuntu-latest
+    needs: repository
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -50,18 +81,21 @@ jobs:
       with:
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_TOKEN }}
-        image_name: ${{ github.repository_owner }}dev/ledgersmb_circleci-perl
+        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-perl
         image_tag: ${{ matrix.version }}
-        build_extra_args: "--build-arg perl=${{ matrix.version }}"
-        push_git_tag: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        build_extra_args: "--build-arg perl=${{ matrix.version }} --build-arg branches=${{ matrix.branches }}"
+        push_git_tag: ${{ github.event.pull_request.merged }}
         context: perl
-        stages_image_name: "${{ github.repository_owner }}dev/ledgersmb_circleci-perl-${{ matrix.version }}-stages"
-        push_image_and_stages: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        pull_image_and_stages: false
+        push_image_and_stages: false
+
   postgres:
     strategy:
       matrix:
         version: ['9.5', '9.6', '10', '11', '12']
-    needs: primary
+    needs:
+      - repository
+      - primary
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -71,10 +105,10 @@ jobs:
       with:
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_TOKEN }}
-        image_name: ${{ github.repository_owner }}dev/ledgersmb_circleci-postgres
+        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-postgres
         image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg postgres=${{ matrix.version }}"
-        push_git_tag: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        push_git_tag: ${{ github.event.pull_request.merged }}
         context: postgres
-        stages_image_name: "${{ github.repository_owner }}dev/ledgersmb_circleci-postgres-${{ matrix.version }}-stages"
-        push_image_and_stages: ${{ github.event_name == 'push' || github.event.pull_request.merged }}
+        pull_image_and_stages: false
+        push_image_and_stages: false
