@@ -34,7 +34,7 @@ jobs:
         context: primary
         push_git_tag: ${{ github.event.pull_request.merged }}
         pull_image_and_stages: false
-        push_image_and_stages: false
+        push_image_and_stages: ${{ github.event.pull_request.merged }}
 
   browsers:
     strategy:
@@ -57,7 +57,7 @@ jobs:
         push_git_tag: ${{ github.event.pull_request.merged }}
         context: ${{ matrix.browser }}
         pull_image_and_stages: false
-        push_image_and_stages: false
+        push_image_and_stages: ${{ github.event.pull_request.merged }}
 
   perl:
     strategy:
@@ -87,7 +87,7 @@ jobs:
         push_git_tag: ${{ github.event.pull_request.merged }}
         context: perl
         pull_image_and_stages: false
-        push_image_and_stages: false
+        push_image_and_stages: ${{ github.event.pull_request.merged }}
 
   postgres:
     strategy:
@@ -111,4 +111,4 @@ jobs:
         push_git_tag: ${{ github.event.pull_request.merged }}
         context: postgres
         pull_image_and_stages: false
-        push_image_and_stages: false
+        push_image_and_stages: ${{ github.event.pull_request.merged }}
