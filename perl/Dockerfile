@@ -1,6 +1,6 @@
 # Perl default version
 ARG perl=5.32
-ARG branches="master,1.9,1.8,1.7,1.6"
+ARG branches="1.6,1.7,1.8,1.9,master"
 
 FROM        perldocker/perl-tester:$perl
 LABEL       maintainer="ylavoie@yveslavoie.com"
@@ -180,10 +180,8 @@ RUN if [[ "$perl" > "5.27.999" && "$perl" < "5.29" ]] ; then \
     rm -rf $HOME/.cpanm; \
   fi
 
-
 RUN npm --loglevel=error install --save-dev webpack webpack-cli && \
-    npm install && \
-    npm dedupe
+    npm ci --ignore-scripts
 
 # Fix PATH
 ENV PATH $HOME/perl5/perlbrew/perls/perl-$perl/bin:$PATH
