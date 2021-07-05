@@ -39,7 +39,7 @@ jobs:
   browsers:
     strategy:
       matrix:
-        browser: ['chrome', 'firefox', 'phantomjs']
+        browser: ['phantomjs']
     needs:
       - repository
       - primary
