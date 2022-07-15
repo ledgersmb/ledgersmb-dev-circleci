@@ -125,6 +125,12 @@ COPY lighttpd.sh /usr/local/bin
 COPY lighttpd*.conf /etc/lighttpd/
 RUN chmod +x /usr/local/bin/lighttpd.sh
 
+## Use Mailhog/mhsendmail as sendmail
+RUN \
+  wget https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 && \
+  chmod +x mhsendmail_linux_amd64 && \
+  mv mhsendmail_linux_amd64 /usr/local/bin/sendmail
+
 # Remove startup warnings
 RUN chown circleci:circleci -R /var/log/nginx /var/log/lighttpd
 
