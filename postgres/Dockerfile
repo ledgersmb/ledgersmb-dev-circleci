@@ -7,7 +7,7 @@ MAINTAINER  LedgerSMB  devel@lists.ledgersmb.org
 ARG version
 
 RUN DEBIAN_FRONTEND="noninteractive" apt-get -qqy update && \
-    apt-get -qqy install postgresql-$version-pgtap && \
+    apt-get -qqy install postgresql-$PG_MAJOR-pgtap && \
     apt-get -qqy autoremove && \
     apt-get -qqy autoclean && \
     rm -rf /var/lib/apt/lists/* && \
