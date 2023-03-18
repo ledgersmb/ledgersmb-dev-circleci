@@ -57,9 +57,6 @@ RUN apt-get update && apt-get -y install gnupg2 \
     libperl-critic-perl libmodule-cpanfile-perl libfile-util-perl \
     libclass-trigger-perl libclass-accessor-lite-perl libtest-requires-perl \
     libmodule-install-perl python3-setuptools libdist-zilla-perl \
-    python3-pip python3-wheel python3-urllib3 && \
-  pip3 install transifex-client && \
-  pip3 install --upgrade urllib3 && \
   apt-get -y install curl ca-certificates wget gnupg2 lsb-release && \
   (curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -) && \
   echo "deb https://deb.nodesource.com/node_16.x $(lsb_release -s -c) main" | tee /etc/apt/sources.list.d/nodesource.list  && \
