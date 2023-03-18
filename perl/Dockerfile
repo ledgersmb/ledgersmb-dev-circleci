@@ -1,6 +1,6 @@
 # Perl default version
 ARG perl=5.32
-ARG branches="1.6,1.7,1.8,1.9,master"
+ARG branches="1.6,1.7,1.8,1.9,1.10,master"
 
 FROM        perldocker/perl-tester:$perl
 LABEL       maintainer="ylavoie@yveslavoie.com"
