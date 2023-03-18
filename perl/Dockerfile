@@ -167,8 +167,8 @@ RUN bash -c 'for branch in ${branches//,/ }; do \
       --feature=openoffice \
       --feature=xls \
       --feature=edi; \
-  done'
-RUN rm -rf $HOME/.cpanm
+  done' && \
+  rm -rf $HOME/.cpanm
 
 RUN cd $HOME/project && \
   cpm install --local-lib-contained=$HOME/perl5 --no-test \
