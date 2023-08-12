@@ -183,7 +183,7 @@ RUN if [[ "$perl" > "5.27.999" && "$perl" < "5.29" ]] ; then \
     rm -rf $HOME/.cpanm; \
   fi
 
-RUN npm --loglevel=error install --save-dev webpack webpack-cli && \
+RUN npm --loglevel=error install --save-dev webpack webpack-cli yarn && \
     npm ci --ignore-scripts
 
 # Fix PATH
