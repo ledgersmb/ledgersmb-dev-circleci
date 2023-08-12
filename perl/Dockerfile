@@ -2,7 +2,8 @@
 ARG perl=5.32
 ARG branches="1.6,1.7,1.8,1.9,1.10,master"
 
-FROM        perl:$perl
+# postgresql-autodoc isn't in bullseye, so choose buster or bookworm
+FROM        perl:$perl-slim-buster
 LABEL       maintainer="ylavoie@yveslavoie.com"
 
 # FROM resets ARG, so redeclare
