@@ -10,7 +10,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 USER root
 
 # Base image for CircleCI
-RUN echo -n "APT::Install-Recommends \"0\";\nAPT::Install-Suggests \"0\";\n" \
+RUN echo -e "\nAPT::Install-Recommends \"0\";\nAPT::Install-Suggests \"0\";\n" \
        >> /etc/apt/apt.conf && \
   apt-get update && apt-get -y install wget gnupg2 ssh tar gzip \
     texlive-xetex texlive-latex-recommended fonts-liberation2 \
