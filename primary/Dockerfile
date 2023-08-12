@@ -15,15 +15,12 @@ RUN echo -e "\nAPT::Install-Recommends \"0\";\nAPT::Install-Suggests \"0\";\n" \
   apt-get update && apt-get -y install wget gnupg2 ssh tar gzip \
     texlive-xetex texlive-latex-recommended fonts-liberation2 \
     git cpanminus make gcc lsb-release gettext procps \
-    ssmtp \
-    python-pip python-setuptools python-six python-urllib3 && \
+    ssmtp && \
   apt-get -qqy autoremove && \
   apt-get -qqy autoclean && \
   rm -rf /var/lib/apt/lists/*
 
 # Install Transifex
-RUN pip install wheel && \
-    pip install transifex-client && \
-    pip install --upgrade urllib3
+RUN curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash ; mv tx /usr/local/bin/
 
 user circleci
