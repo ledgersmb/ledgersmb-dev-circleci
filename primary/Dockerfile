@@ -2,7 +2,7 @@
 # uglify implementation.
 # See: https://github.com/dojo/util/pull/78
 
-FROM        circleci/node:12-stretch
+FROM        cimg/node:current
 MAINTAINER  ylavoie@yveslavoie.com
 
 ENV DEBIAN_FRONTEND=noninteractive
