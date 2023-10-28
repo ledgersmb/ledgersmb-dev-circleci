@@ -1,6 +1,6 @@
 # Perl default version
 ARG perl=5.32
-ARG branches="1.6,1.7,1.8,1.9,1.10,master"
+ARG branches="1.8,1.9,1.10,master"
 
 # postgresql-autodoc isn't in bullseye, so choose buster or bookworm
 FROM        perl:$perl-slim-buster
@@ -46,10 +46,11 @@ RUN apt-get update && apt-get -y install gnupg2 \
     libtemplate-plugin-latex-perl libtex-encode-perl \
     libxml-twig-perl libopenoffice-oodoc-perl \
     libexcel-writer-xlsx-perl libspreadsheet-writeexcel-perl \
-    libclass-c3-xs-perl liblocale-codes-perl \
+    libclass-c3-xs-perl liblocale-codes-perl libexpat1-dev libexpat1 \
+    libpq-dev libpq5 \
     texlive-latex-recommended texlive-fonts-recommended \
     texlive-xetex fonts-liberation \
-    git cpanminus make gcc libperl-dev libcarp-always-perl \
+    git cpanminus make gcc libperl-dev libcarp-always-perl liblocal-lib-perl \
     ssh tar gzip graphviz \
     gettext procps libtap-parser-sourcehandler-pgtap-perl \
     libtest2-suite-perl libfile-mimeinfo-perl libhtml-lint-perl \
@@ -60,7 +61,7 @@ RUN apt-get update && apt-get -y install gnupg2 \
     libmodule-install-perl python3-setuptools libdist-zilla-perl && \
   apt-get -y install curl ca-certificates wget gnupg2 lsb-release && \
   (curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -) && \
-  echo "deb https://deb.nodesource.com/node_16.x $(lsb_release -s -c) main" | tee /etc/apt/sources.list.d/nodesource.list  && \
+  echo "deb https://deb.nodesource.com/node_20.x $(lsb_release -s -c) main" | tee /etc/apt/sources.list.d/nodesource.list  && \
   echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
   (wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -) && \
   apt-get -y update && \
@@ -148,8 +149,7 @@ RUN cd && \
   git clone -b master https://github.com/ledgersmb/LedgerSMB.git project
 
 RUN cd $HOME/project && \
-    cpanm --local-lib=$HOME/perl5 -nq App::cpm inc::Module::Install && \
-    perl -Mlocal::lib  >> $HOME/.profile
+    cpanm --local-lib=$HOME/perl5 -nq App::cpm inc::Module::Install
 
 # FROM resets ARG, so redeclare
 ARG branches
@@ -158,7 +158,7 @@ ARG branches
 RUN bash -c 'for branch in ${branches//,/ }; do \
     cd $HOME/project && \
     git checkout $branch && \
-    cpm install --local-lib-contained=$HOME/perl5 --no-test \
+    cpm install --local-lib-contained=$HOME/perl5 --no-test --show-build-log-on-failure \
       --with-develop \
       --feature=starman \
       --feature=latex-pdf-ps \
@@ -169,7 +169,7 @@ RUN bash -c 'for branch in ${branches//,/ }; do \
   rm -rf $HOME/.cpanm
 
 RUN cd $HOME/project && \
-  cpm install --local-lib-contained=$HOME/perl5 --no-test \
+  cpm install --local-lib-contained=$HOME/perl5 --no-test --show-build-log-on-failure \
       Starman \
       URL::Encode URL::Encode::XS \
       Pod::ProjectDocs \
@@ -179,7 +179,7 @@ RUN cd $HOME/project && \
 
 RUN if [[ "$perl" > "5.27.999" && "$perl" < "5.29" ]] ; then \
     cd $HOME/project && \
-    cpm install --local-lib-contained=$HOME/perl5 --no-test \
+    cpm install --local-lib-contained=$HOME/perl5 --no-test --show-build-log-on-failure \
         B::Debug && \
     rm -rf $HOME/.cpanm; \
   fi
