@@ -3,39 +3,6 @@ name: Docker Image CI
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  preFlight:
-    name: "Preflight Checks"
-    runs-on: ubuntu-latest
-    steps:
-
-    - name: Assert Secrets Present
-      shell: bash
-      run: |
-        MD5() {
-          result=($(md5sum <(echo "${1}")))
-          echo $result
-        }
-
-        secretPresent() {
-          emptyHash=$(MD5 "")
-          secretHash=$(MD5 "${1}")
-          ! diff <(echo $secretHash) <(echo $emptyHash) &> /dev/null
-        }
-
-        errorMessage() {
-          echo "Your secret ${1} seems to be missing please contact the LedgerSMB team"
-          return 1
-        }
-
-        secretStatus=0
-
-        secretPresent "${{ secrets.DOCKER_TOKEN }}" || errorMessage "DOCKER_TOKEN" || secretStatus=1
-        secretPresent "${{ secrets.DOCKER_TOKEN }}" || errorMessage "DOCKER_TOKEN" || secretStatus=2
-
-        exit $secretStatus
-
-    - run: echo "Everything Checks Out 👍"
-
   perl:
     strategy:
       matrix:
@@ -49,7 +16,6 @@ jobs:
           #- version: "5.28"
           #  branches: "1.9"
     runs-on: ubuntu-latest
-    needs: preFlight
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -57,7 +23,7 @@ jobs:
       uses: whoan/docker-build-with-cache-action@next
       with:
         username: ${{ github.actor }}
-        password: ${{ secrets.DOCKER_TOKEN }}
+        password: ${{ secrets.GITHUB_TOKEN }}
         image_name: ${{github.repository_owner}}/ledgersmb_circleci-perl
         image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg perl=${{ matrix.version }} --build-arg branches=${{ matrix.branches }}"
@@ -70,8 +36,6 @@ jobs:
     strategy:
       matrix:
         version: ['12', '13', '14']
-    needs:
-      - preFlight
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -80,7 +44,7 @@ jobs:
       uses: whoan/docker-build-with-cache-action@next
       with:
         username: ${{ github.actor }}
-        password: ${{ secrets.DOCKER_TOKEN }}
+        password: ${{ secrets.GITHUB_TOKEN }}
         image_name: ${{github.repository_owner}}/ledgersmb_circleci-postgres
         image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg version=${{ matrix.version }}"
