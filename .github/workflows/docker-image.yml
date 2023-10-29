@@ -29,8 +29,8 @@ jobs:
 
         secretStatus=0
 
-        secretPresent "${{ secrets.GITHUB_TOKEN }}" || errorMessage "GITHUB_TOKEN" || secretStatus=1
-        secretPresent "${{ secrets.GITHUB_TOKEN }}" || errorMessage "GITHUB_TOKEN" || secretStatus=2
+        secretPresent "${{ secrets.DOCKER_TOKEN }}" || errorMessage "DOCKER_TOKEN" || secretStatus=1
+        secretPresent "${{ secrets.DOCKER_TOKEN }}" || errorMessage "DOCKER_TOKEN" || secretStatus=2
 
         exit $secretStatus
 
@@ -63,29 +63,9 @@ jobs:
       with:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-        registry: ghcr.io
-        image_name: ledgersmb_circleci-primary
-        pull_image_and_stages: false
-        push_image_and_stages: false
-
-  browsers:
-    strategy:
-      matrix:
-        browser: ['phantomjs']
-    needs:
-      - repository
-      - primary
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Build and push to Docker Hub
-      uses: whoan/docker-build-with-cache-action@next
-      with:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        registry: ghcr.io
-        image_name: ledgersmb_circleci-browsers
+        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-primary
+        image_tag: latest
+        context: primary
         pull_image_and_stages: false
         push_image_and_stages: false
 
@@ -97,10 +77,10 @@ jobs:
             branches: "1.9,1.10,1.11,master"
           - version: "5.32"
             branches: "1.9,1.10,1.11"
-          - version: "5.30"
-            branches: "1.9,1.10"
-          - version: "5.28"
-            branches: "1.9"
+          #- version: "5.30"
+          #  branches: "1.9,1.10"
+          #- version: "5.28"
+          #  branches: "1.9"
     runs-on: ubuntu-latest
     needs: repository
     steps:
@@ -110,17 +90,18 @@ jobs:
       uses: whoan/docker-build-with-cache-action@next
       with:
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        registry: ghcr.io
-        image_name: ledgersmb_circleci-perl
+        password: ${{ secrets.DOCKER_TOKEN }}
+        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-perl
+        image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg perl=${{ matrix.version }} --build-arg branches=${{ matrix.branches }}"
+        context: perl
         pull_image_and_stages: false
         push_image_and_stages: false
 
   postgres:
     strategy:
       matrix:
-        version: ['10', '11', '12', '13', '14']
+        version: ['12', '13', '14']
     needs:
       - repository
       - primary
@@ -132,9 +113,10 @@ jobs:
       uses: whoan/docker-build-with-cache-action@next
       with:
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        registry: ghcr.io
-        image_name: ledgersmb_circleci-postgres
+        password: ${{ secrets.DOCKER_TOKEN }}
+        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-postgres
+        image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg postgres=${{ matrix.version }}"
+        context: postgres
         pull_image_and_stages: false
         push_image_and_stages: false
