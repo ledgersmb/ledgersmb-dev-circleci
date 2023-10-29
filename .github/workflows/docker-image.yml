@@ -62,7 +62,7 @@ jobs:
         image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg perl=${{ matrix.version }} --build-arg branches=${{ matrix.branches }}"
         context: perl
-        registry: ghcr.io/ledgersmb/
+        registry: ghcr.io/ledgersmb
         pull_image_and_stages: false
         push_image_and_stages: false
 
@@ -85,6 +85,6 @@ jobs:
         image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg postgres=${{ matrix.version }}"
         context: postgres
-        registry: ghcr.io/ledgersmb/
+        registry: ghcr.io/ledgersmb
         pull_image_and_stages: false
         push_image_and_stages: false
