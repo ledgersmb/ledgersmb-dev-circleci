@@ -36,18 +36,6 @@ jobs:
 
     - run: echo "Everything Checks Out 👍"
 
-  repository:
-    runs-on: ubuntu-latest
-    needs: preFlight
-    outputs:
-      hub: ${{ steps.docker_hub.outputs.hub }}
-    steps:
-      - name: Use proper Docker hub
-        id: docker_hub
-        shell: bash
-        run: |
-          echo ::set-output name=hub::${{ github.repository_owner }}
-
   perl:
     strategy:
       matrix:
@@ -61,7 +49,7 @@ jobs:
           #- version: "5.28"
           #  branches: "1.9"
     runs-on: ubuntu-latest
-    needs: repository
+    needs: preFlight
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -70,7 +58,7 @@ jobs:
       with:
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_TOKEN }}
-        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-perl
+        image_name: ${{github.repository_owner}}/ledgersmb_circleci-perl
         image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg perl=${{ matrix.version }} --build-arg branches=${{ matrix.branches }}"
         context: perl
@@ -83,8 +71,7 @@ jobs:
       matrix:
         version: ['12', '13', '14']
     needs:
-      - repository
-      - primary
+      - preFlight
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -94,7 +81,7 @@ jobs:
       with:
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_TOKEN }}
-        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-postgres
+        image_name: ${{github.repository_owner}}/ledgersmb_circleci-postgres
         image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg postgres=${{ matrix.version }}"
         context: postgres
