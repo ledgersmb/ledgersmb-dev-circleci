@@ -30,7 +30,7 @@ jobs:
         secretStatus=0
 
         secretPresent "${{ secrets.GITHUB_TOKEN }}" || errorMessage "GITHUB_TOKEN" || secretStatus=1
-        secretPresent "${{ secrets.DOCKER_TOKEN }}" || errorMessage "DOCKER_TOKEN" || secretStatus=2
+        secretPresent "${{ secrets.GITHUB_TOKEN }}" || errorMessage "GITHUB_TOKEN" || secretStatus=2
 
         exit $secretStatus
 
@@ -59,16 +59,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Build and push to Docker Hub
-      uses: whoan/docker-build-with-cache-action@v5
+      uses: whoan/docker-build-with-cache-action@next
       with:
         username: ${{ github.actor }}
-        password: ${{ secrets.DOCKER_TOKEN }}
-        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-primary
-        image_tag: latest
-        context: primary
-        push_git_tag: ${{ github.event.pull_request.merged }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: ghcr.io
+        image_name: ledgersmb_circleci-primary
         pull_image_and_stages: false
-        #push_image_and_stages: ${{ github.event.pull_request.merged }}
+        push_image_and_stages: false
 
   browsers:
     strategy:
@@ -82,51 +80,47 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Build and push to Docker Hub
-      uses: whoan/docker-build-with-cache-action@v5
+      uses: whoan/docker-build-with-cache-action@next
       with:
         username: ${{ github.actor }}
-        password: ${{ secrets.DOCKER_TOKEN }}
-        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-browsers
-        image_tag: ${{ matrix.browser }}
-        push_git_tag: ${{ github.event.pull_request.merged }}
-        context: ${{ matrix.browser }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: ghcr.io
+        image_name: ledgersmb_circleci-browsers
         pull_image_and_stages: false
-        #push_image_and_stages: ${{ github.event.pull_request.merged }}
+        push_image_and_stages: false
 
   perl:
     strategy:
       matrix:
         include:
           - version: "5.34"
-            branches: "1.8,1.9,1.10,master"
+            branches: "1.9,1.10,1.11,master"
           - version: "5.32"
-            branches: "1.7,1.8,1.9,1.10"
+            branches: "1.9,1.10,1.11"
           - version: "5.30"
-            branches: "1.6,1.7,1.8"
+            branches: "1.9,1.10"
           - version: "5.28"
-            branches: "1.6,1.7"
+            branches: "1.9"
     runs-on: ubuntu-latest
     needs: repository
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Build and push to Docker Hub
-      uses: whoan/docker-build-with-cache-action@v5
+      uses: whoan/docker-build-with-cache-action@next
       with:
         username: ${{ github.actor }}
-        password: ${{ secrets.DOCKER_TOKEN }}
-        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-perl
-        image_tag: ${{ matrix.version }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: ghcr.io
+        image_name: ledgersmb_circleci-perl
         build_extra_args: "--build-arg perl=${{ matrix.version }} --build-arg branches=${{ matrix.branches }}"
-        push_git_tag: ${{ github.event.pull_request.merged }}
-        context: perl
         pull_image_and_stages: false
-        #push_image_and_stages: ${{ github.event.pull_request.merged }}
+        push_image_and_stages: false
 
   postgres:
     strategy:
       matrix:
-        version: ['9.5', '9.6', '10', '11', '12', '13', '14']
+        version: ['10', '11', '12', '13', '14']
     needs:
       - repository
       - primary
@@ -135,14 +129,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Build and push to Docker Hub
-      uses: whoan/docker-build-with-cache-action@v5
+      uses: whoan/docker-build-with-cache-action@next
       with:
         username: ${{ github.actor }}
-        password: ${{ secrets.DOCKER_TOKEN }}
-        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-postgres
-        image_tag: ${{ matrix.version }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: ghcr.io
+        image_name: ledgersmb_circleci-postgres
         build_extra_args: "--build-arg postgres=${{ matrix.version }}"
-        push_git_tag: ${{ github.event.pull_request.merged }}
-        context: postgres
         pull_image_and_stages: false
-        #push_image_and_stages: ${{ github.event.pull_request.merged }}
+        push_image_and_stages: false
