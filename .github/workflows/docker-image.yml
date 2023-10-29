@@ -46,11 +46,7 @@ jobs:
         id: docker_hub
         shell: bash
         run: |
-          if [ "${{ github.repository_owner }}" == "ledgersmb" ]; then
-            echo ::set-output name=hub::ledgersmbdev
-          else
-            echo ::set-output name=hub::${{ github.repository_owner }}
-          fi
+          echo ::set-output name=hub::${{ github.repository_owner }}
 
   primary:
     runs-on: ubuntu-latest
