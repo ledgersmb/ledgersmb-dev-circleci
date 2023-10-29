@@ -68,7 +68,7 @@ jobs:
         context: primary
         push_git_tag: ${{ github.event.pull_request.merged }}
         pull_image_and_stages: false
-        push_image_and_stages: ${{ github.event.pull_request.merged }}
+        #push_image_and_stages: ${{ github.event.pull_request.merged }}
 
   browsers:
     strategy:
@@ -91,16 +91,16 @@ jobs:
         push_git_tag: ${{ github.event.pull_request.merged }}
         context: ${{ matrix.browser }}
         pull_image_and_stages: false
-        push_image_and_stages: ${{ github.event.pull_request.merged }}
+        #push_image_and_stages: ${{ github.event.pull_request.merged }}
 
   perl:
     strategy:
       matrix:
         include:
           - version: "5.34"
-            branches: "1.6,1.7,1.8,1.9,master"
+            branches: "1.8,1.9,1.10,master"
           - version: "5.32"
-            branches: "1.6,1.7,1.8,1.9,master"
+            branches: "1.7,1.8,1.9,1.10"
           - version: "5.30"
             branches: "1.6,1.7,1.8"
           - version: "5.28"
@@ -121,12 +121,12 @@ jobs:
         push_git_tag: ${{ github.event.pull_request.merged }}
         context: perl
         pull_image_and_stages: false
-        push_image_and_stages: ${{ github.event.pull_request.merged }}
+        #push_image_and_stages: ${{ github.event.pull_request.merged }}
 
   postgres:
     strategy:
       matrix:
-        version: ['9.5', '9.6', '10', '11', '12']
+        version: ['9.5', '9.6', '10', '11', '12', '13', '14']
     needs:
       - repository
       - primary
@@ -145,4 +145,4 @@ jobs:
         push_git_tag: ${{ github.event.pull_request.merged }}
         context: postgres
         pull_image_and_stages: false
-        push_image_and_stages: ${{ github.event.pull_request.merged }}
+        #push_image_and_stages: ${{ github.event.pull_request.merged }}
