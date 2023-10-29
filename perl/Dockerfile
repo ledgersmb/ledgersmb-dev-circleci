@@ -50,7 +50,7 @@ RUN apt-get update && apt-get -y install gnupg2 \
     libpq-dev libpq5 \
     texlive-latex-recommended texlive-fonts-recommended \
     texlive-xetex fonts-liberation \
-    git cpanminus make gcc libperl-dev libcarp-always-perl liblocal-lib-perl \
+    git cpanminus make gcc libperl-dev libcarp-always-perl \
     ssh tar gzip graphviz \
     gettext procps libtap-parser-sourcehandler-pgtap-perl \
     libtest2-suite-perl libfile-mimeinfo-perl libhtml-lint-perl \
@@ -85,6 +85,8 @@ RUN apt-get -y install locales sudo jq bc gnuplot \
 # Including postgresql-autodoc in the above total lump didn't work;
 #   splitting out did...
 RUN apt-get -y install postgresql-autodoc
+
+RUN cpanm install local::lib
 
 #CircleCI++, copied from CircleCI-Node:14.9.0-buster
 
@@ -149,7 +151,8 @@ RUN cd && \
   git clone -b master https://github.com/ledgersmb/LedgerSMB.git project
 
 RUN cd $HOME/project && \
-    cpanm --local-lib=$HOME/perl5 -nq App::cpm inc::Module::Install
+    cpanm --local-lib=$HOME/perl5 -nq App::cpm inc::Module::Install && \
+    perl -Mlocal::lib  >> $HOME/.profile
 
 # FROM resets ARG, so redeclare
 ARG branches
