@@ -83,7 +83,7 @@ jobs:
         password: ${{ secrets.DOCKER_TOKEN }}
         image_name: ${{github.repository_owner}}/ledgersmb_circleci-postgres
         image_tag: ${{ matrix.version }}
-        build_extra_args: "--build-arg postgres=${{ matrix.version }}"
+        build_extra_args: "--build-arg version=${{ matrix.version }}"
         context: postgres
         registry: ghcr.io/ledgersmb
         pull_image_and_stages: false
