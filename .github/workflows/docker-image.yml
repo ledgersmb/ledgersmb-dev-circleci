@@ -30,7 +30,7 @@ jobs:
         context: perl
         registry: ghcr.io/ledgersmb
         pull_image_and_stages: false
-        push_image_and_stages: false
+        push_image_and_stages: true
 
   postgres:
     strategy:
@@ -51,4 +51,4 @@ jobs:
         context: postgres
         registry: ghcr.io/ledgersmb
         pull_image_and_stages: false
-        push_image_and_stages: false
+        push_image_and_stages: true
