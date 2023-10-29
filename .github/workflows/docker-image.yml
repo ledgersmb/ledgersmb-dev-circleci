@@ -29,8 +29,8 @@ jobs:
 
         secretStatus=0
 
-        secretPresent "${{ secrets.GITHUB_TOKEN }}" || errorMessage "GITHUB_TOKEN" || secretStatus=1
-        secretPresent "${{ secrets.GITHUB_TOKEN }}" || errorMessage "GITHUB_TOKEN" || secretStatus=2
+        secretPresent "${{ secrets.DOCKER_TOKEN }}" || errorMessage "DOCKER_TOKEN" || secretStatus=1
+        secretPresent "${{ secrets.DOCKER_TOKEN }}" || errorMessage "DOCKER_TOKEN" || secretStatus=2
 
         exit $secretStatus
 
@@ -63,8 +63,9 @@ jobs:
       with:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-        registry: ghcr.io
-        image_name: ledgersmb_circleci-primary
+        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-primary
+        image_tag: latest
+        context: primary
         pull_image_and_stages: false
         push_image_and_stages: false
 
@@ -83,9 +84,10 @@ jobs:
       uses: whoan/docker-build-with-cache-action@next
       with:
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        registry: ghcr.io
-        image_name: ledgersmb_circleci-browsers
+        password: ${{ secrets.DOCKER_TOKEN }}
+        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-browsers
+        image_tag: ${{ matrix.browser }}
+        context: ${{ matrix.browser }}
         pull_image_and_stages: false
         push_image_and_stages: false
 
@@ -110,10 +112,11 @@ jobs:
       uses: whoan/docker-build-with-cache-action@next
       with:
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        registry: ghcr.io
-        image_name: ledgersmb_circleci-perl
+        password: ${{ secrets.DOCKER_TOKEN }}
+        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-perl
+        image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg perl=${{ matrix.version }} --build-arg branches=${{ matrix.branches }}"
+        context: perl
         pull_image_and_stages: false
         push_image_and_stages: false
 
@@ -132,9 +135,10 @@ jobs:
       uses: whoan/docker-build-with-cache-action@next
       with:
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        registry: ghcr.io
-        image_name: ledgersmb_circleci-postgres
+        password: ${{ secrets.DOCKER_TOKEN }}
+        image_name: ${{needs.repository.outputs.hub}}/ledgersmb_circleci-postgres
+        image_tag: ${{ matrix.version }}
         build_extra_args: "--build-arg postgres=${{ matrix.version }}"
+        context: postgres
         pull_image_and_stages: false
         push_image_and_stages: false
