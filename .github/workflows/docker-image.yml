@@ -26,7 +26,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
-        push: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
+        push: ${{ github.event_name == 'pull_request' && contains(github.ref, '/merge') && github.ref == 'refs/pull/merge' && startsWith(github.head_ref, 'refs/heads/master') }}
         tags: ghcr.io/${{github.repository_owner}}/ledgersmb_circleci-perl:${{ matrix.version }}
         build-args: |
           perl=${{ matrix.version }}
@@ -52,7 +52,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
-        push: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
+        push: ${{ github.event_name == 'pull_request' && contains(github.ref, '/merge') && github.ref == 'refs/pull/merge' && startsWith(github.head_ref, 'refs/heads/master') }}
         tags: ghcr.io/${{github.repository_owner}}/ledgersmb_circleci-postgres:${{ matrix.version }}
         build-args: |
           version=${{ matrix.version }}
