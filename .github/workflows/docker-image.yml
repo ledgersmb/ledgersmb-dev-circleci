@@ -23,10 +23,16 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check if pull request is merged into master
+      id: check-merge
+      run: |
+        from_branch="${{ github.event.pull_request.head.ref }}"
+        to_branch="${{ github.event.pull_request.base.ref }}"
+        echo "{is_merge_into_master}={"$from_branch" != "$to_branch" && "$to_branch" == "master"}" >> $GITHUB_OUTPUT
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
-        push: ${{ github.event.pull_request.merged == true }}
+        push: ${{ steps.check-merge.outputs.is_merge_into_master == 'true' }}
         tags: ghcr.io/${{github.repository_owner}}/ledgersmb_circleci-perl:${{ matrix.version }}
         build-args: |
           perl=${{ matrix.version }}
@@ -49,10 +55,16 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check if pull request is merged into master
+      id: check-merge
+      run: |
+        from_branch="${{ github.event.pull_request.head.ref }}"
+        to_branch="${{ github.event.pull_request.base.ref }}"
+        echo "{is_merge_into_master}={"$from_branch" != "$to_branch" && "$to_branch" == "master"}" >> $GITHUB_OUTPUT
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
-        push: ${{ github.event.pull_request.merged == true }}
+        push: ${{ steps.check-merge.outputs.is_merge_into_master == 'true' }}
         tags: ghcr.io/${{github.repository_owner}}/ledgersmb_circleci-postgres:${{ matrix.version }}
         build-args: |
           version=${{ matrix.version }}
