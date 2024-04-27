@@ -1,9 +1,9 @@
 # Perl default version
-ARG perl=5.32
+ARG perl=5.36
 ARG branches="1.8,1.9,1.10,master"
 
 # postgresql-autodoc isn't in bullseye, so choose buster or bookworm
-FROM        perl:$perl-slim-buster
+FROM        perl:$perl-slim-bookworm
 LABEL       maintainer="ylavoie@yveslavoie.com"
 
 # FROM resets ARG, so redeclare
@@ -20,46 +20,14 @@ RUN echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/90circleci \
 RUN echo 'APT::Install-Recommends "0";' 'APT::Install-Suggests "0";' \
        >> /etc/apt/apt.conf
 RUN apt-get update && apt-get -y install gnupg2 \
-    libauthen-sasl-perl libcgi-emulate-psgi-perl libconfig-inifiles-perl \
-    libcookie-baker-perl libdbd-pg-perl libdbi-perl libdata-uuid-perl \
-    libdatetime-perl libdatetime-format-strptime-perl \
-    libemail-sender-perl libemail-stuffer-perl libfile-find-rule-perl \
-    libhtml-escape-perl libhttp-headers-fast-perl libio-stringy-perl \
-    libjson-maybexs-perl libcpanel-json-xs-perl libjson-pp-perl \
-    liblist-moreutils-perl \
-    liblocale-maketext-perl liblocale-maketext-lexicon-perl \
-    liblog-log4perl-perl libmime-types-perl \
-    libmath-bigint-gmp-perl libmodule-runtime-perl libmoo-perl \
-    libmoox-types-mooselike-perl libmoose-perl \
-    libmoosex-nonmoose-perl libnumber-format-perl \
-    libpgobject-perl libpgobject-simple-perl libpgobject-simple-role-perl \
-    libpgobject-type-bigfloat-perl libpgobject-type-datetime-perl \
-    libpgobject-type-bytestring-perl libpgobject-util-dbmethod-perl \
-    libpgobject-util-dbadmin-perl libplack-perl \
-    libplack-builder-conditionals-perl libplack-middleware-reverseproxy-perl \
-    libplack-request-withencoding-perl libscope-guard-perl \
-    libsession-storage-secure-perl libstring-random-perl \
-    libtemplate-perl libtext-csv-perl libtext-csv-xs-perl \
-    libtext-markdown-perl libtry-tiny-perl libversion-compare-perl \
-    libxml2 libxml2-dev libxml-simple-perl libnamespace-autoclean-perl \
-    starman starlet libhttp-parser-xs-perl \
-    libtemplate-plugin-latex-perl libtex-encode-perl \
-    libxml-twig-perl libopenoffice-oodoc-perl \
-    libxml-libxml-perl libarray-printcols-perl \
-    libexcel-writer-xlsx-perl libspreadsheet-writeexcel-perl \
-    libclass-c3-xs-perl liblocale-codes-perl libexpat1-dev libexpat1 \
+    libexpat1-dev libexpat1 \
     libpq-dev libpq5 \
     texlive-latex-recommended texlive-fonts-recommended \
     texlive-xetex fonts-liberation \
-    git cpanminus make gcc libperl-dev libcarp-always-perl \
+    git cpanminus make gcc libperl-dev \
+    libxml2 libxml2-dev \
     ssh tar gzip graphviz \
-    gettext procps libtap-parser-sourcehandler-pgtap-perl \
-    libtest2-suite-perl libfile-mimeinfo-perl libhtml-lint-perl \
-    libpod-projectdocs-perl libyaml-perl \
-    libtest-dependencies-perl libtest-exception-perl libtest-trap-perl \
-    libperl-critic-perl libmodule-cpanfile-perl libfile-util-perl \
-    libclass-trigger-perl libclass-accessor-lite-perl libtest-requires-perl \
-    libmodule-install-perl python3-setuptools libdist-zilla-perl && \
+    gettext procps && \
   apt-get -y install curl ca-certificates wget gnupg2 lsb-release && \
   mkdir -p /etc/apt/keyrings && \
   (curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor > /etc/apt/keyrings/nodesource.gpg ) && \
@@ -69,17 +37,7 @@ RUN apt-get update && apt-get -y install gnupg2 \
   apt-get -y update && \
   apt-get -y install nodejs postgresql-client
 
-# Additional (testing) dependencies up to and including 1.9
-RUN apt-get -y install libpath-class-perl libtype-tiny-perl libtype-tiny-xs-perl libclass-factory-perl libyaml-syck-perl libmoox-handlesvia-perl libpod-coverage-perl libhash-merge-perl libpod-pom-perl libfile-share-perl libtext-diff-perl libhtml-selector-xpath-perl libtest-pod-perl libdbd-mock-perl libx12-parser-perl liblog-any-adapter-log4perl-perl libtest-pod-coverage-perl
-
-# Additional dependency up to and including 1.7
-RUN apt-get -y install libmime-lite-perl
-
-# Additional dependency up to and including 1.5
-RUN apt-get -y install libcgi-simple-perl libhttp-exception-perl libtest-nowarnings-perl
-
-# Additional dependency up to and including 1.6
-RUN apt-get -y install liblist-someutils-perl libtest-warn-perl libtest-most-perl libtest-differences-perl libparallel-forkmanager-perl libmodule-util-perl
+RUN npm --loglevel=error install --no-save -g webpack webpack-cli yarn
 
 RUN apt-get -y install locales sudo jq bc gnuplot \
     docker.io docker-compose
@@ -188,9 +146,6 @@ RUN if [[ "$perl" > "5.27.999" && "$perl" < "5.29" ]] ; then \
         B::Debug && \
     rm -rf $HOME/.cpanm; \
   fi
-
-RUN npm --loglevel=error install --save-dev webpack webpack-cli yarn && \
-    npm ci --ignore-scripts
 
 # Fix PATH
 ENV PATH $HOME/perl5/perlbrew/perls/perl-$perl/bin:$PATH
