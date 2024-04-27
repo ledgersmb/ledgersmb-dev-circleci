@@ -41,11 +41,11 @@ RUN apt-get update && apt-get -y install gnupg2 \
     libsession-storage-secure-perl libstring-random-perl \
     libtemplate-perl libtext-csv-perl libtext-csv-xs-perl \
     libtext-markdown-perl libtry-tiny-perl libversion-compare-perl \
-    libxml-simple-perl libnamespace-autoclean-perl \
+    libxml2 libxml2-dev libxml-simple-perl libnamespace-autoclean-perl \
     starman starlet libhttp-parser-xs-perl \
     libtemplate-plugin-latex-perl libtex-encode-perl \
     libxml-twig-perl libopenoffice-oodoc-perl \
-    libxml-libxml-perl libarray-printcols-perl \
+    libxml-libxml-perl elibarray-printcols-perl \
     libexcel-writer-xlsx-perl libspreadsheet-writeexcel-perl \
     libclass-c3-xs-perl liblocale-codes-perl libexpat1-dev libexpat1 \
     libpq-dev libpq5 \
