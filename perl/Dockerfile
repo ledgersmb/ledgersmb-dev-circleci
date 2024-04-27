@@ -45,6 +45,7 @@ RUN apt-get update && apt-get -y install gnupg2 \
     starman starlet libhttp-parser-xs-perl \
     libtemplate-plugin-latex-perl libtex-encode-perl \
     libxml-twig-perl libopenoffice-oodoc-perl \
+    libxml-libxml-perl libarray-printcols-perl \
     libexcel-writer-xlsx-perl libspreadsheet-writeexcel-perl \
     libclass-c3-xs-perl liblocale-codes-perl libexpat1-dev libexpat1 \
     libpq-dev libpq5 \
