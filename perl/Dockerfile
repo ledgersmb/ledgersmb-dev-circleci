@@ -95,14 +95,14 @@ RUN \
 # Remove startup warnings
 RUN chown circleci:circleci -R /var/log/nginx /var/log/lighttpd
 
-ENV HOME /home/circleci
+ENV HOME=/home/circleci
 SHELL ["/bin/bash", "-c"]
 
 USER circleci
 WORKDIR $HOME
 
 # Build time variables
-ENV NODE_PATH /usr/lib/node_modules
+ENV NODE_PATH=/usr/lib/node_modules
 
 # Install a fresh LedgerSMB
 ADD https://api.github.com/repos/ledgersmb/ledgersmb/git/refs/heads/master \
@@ -148,7 +148,7 @@ RUN if [[ "$perl" > "5.27.999" && "$perl" < "5.29" ]] ; then \
   fi
 
 # Fix PATH
-ENV PATH $HOME/perl5/perlbrew/perls/perl-$perl/bin:$PATH
+ENV PATH=$HOME/perl5/perlbrew/perls/perl-$perl/bin:$PATH
 
 # Internal Port Expose
 EXPOSE 5762
