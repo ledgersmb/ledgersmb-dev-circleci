@@ -11,6 +11,8 @@ jobs:
             branches: "1.11,1.12,master"
           - version: "5.36"
             branches: "1.11,1.12"
+          - version: "5.34"
+            branches: "1.11"
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
