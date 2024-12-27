@@ -52,7 +52,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
-        push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        push: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/master' }}
         tags: ghcr.io/${{github.repository_owner}}/ledgersmb_circleci-postgres:${{ matrix.version }}
         build-args: |
           version=${{ matrix.version }}
