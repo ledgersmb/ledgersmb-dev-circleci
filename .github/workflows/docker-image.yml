@@ -57,3 +57,11 @@ jobs:
         build-args: |
           version=${{ matrix.version }}
         context: "{{defaultContext}}:postgres"
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: [ 'perl', 'postgres' ]
+    steps:
+    - name: ghcr.io cleanup action
+      uses: dataaxiom/ghcr-cleanup-action@v1
+      with:  
+        dry-run: true
