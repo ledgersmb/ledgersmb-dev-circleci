@@ -65,4 +65,3 @@ jobs:
       uses: dataaxiom/ghcr-cleanup-action@v1
       with:
         packages: ledgersmb_circleci-perl,ledgersmb_circleci-postgres
-        dry-run: true
